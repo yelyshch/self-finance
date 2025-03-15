@@ -1,16 +1,27 @@
+require('dotenv').config();
 const axios = require('axios');
-const jwt = require('jsonwebtoken');
 
 // URL для доступу до User Service
-const USER_SERVICE_URL = 'http://localhost:5001/api/users';
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL;
+
+// Функція для виконання запитів
+const makeRequest = async (method, url, data = null, token = null) => {
+  try {
+    const config = token ? { headers: { Authorization: token } } : {};
+    const response = await axios({ method, url, data, ...config });
+    return response.data;
+  } catch (error) {
+    console.error(error.response ? error.response.data : error.message);
+    throw new Error('Error performing request');
+  }
+};
 
 // Реєстрація користувача
 exports.registerUser = async (req, res) => {
   try {
-    const response = await axios.post(`${USER_SERVICE_URL}/register`, req.body);
-    res.status(201).json(response.data);
+    const user = await makeRequest('POST', `${USER_SERVICE_URL}/register`, req.body);
+    res.status(201).json(user);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error registering user' });
   }
 };
@@ -18,10 +29,9 @@ exports.registerUser = async (req, res) => {
 // Логін користувача
 exports.loginUser = async (req, res) => {
   try {
-    const response = await axios.post(`${USER_SERVICE_URL}/login`, req.body);
-    res.status(200).json(response.data);
+    const user = await makeRequest('POST', `${USER_SERVICE_URL}/login`, req.body);
+    res.status(200).json(user);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error logging in' });
   }
 };
@@ -29,12 +39,12 @@ exports.loginUser = async (req, res) => {
 // Отримання поточного користувача
 exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await axios.get(`${USER_SERVICE_URL}/me`, {
-      headers: { Authorization: req.headers.authorization },
-    });
-    res.status(200).json(user.data);
+    if (!req.headers.authorization) {
+      return res.status(400).json({ message: 'Authorization header is missing' });
+    }
+    const user = await makeRequest('GET', `${USER_SERVICE_URL}/me`, null, req.headers.authorization);
+    res.status(200).json(user);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error fetching current user' });
   }
 };
@@ -42,12 +52,12 @@ exports.getCurrentUser = async (req, res) => {
 // Оновлення користувача
 exports.updateUser = async (req, res) => {
   try {
-    const user = await axios.put(`${USER_SERVICE_URL}/update`, req.body, {
-      headers: { Authorization: req.headers.authorization },
-    });
-    res.status(200).json(user.data);
+    if (!req.headers.authorization) {
+      return res.status(400).json({ message: 'Authorization header is missing' });
+    }
+    const user = await makeRequest('PUT', `${USER_SERVICE_URL}/update`, req.body, req.headers.authorization);
+    res.status(200).json(user);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error updating user' });
   }
 };
@@ -55,12 +65,12 @@ exports.updateUser = async (req, res) => {
 // Видалення користувача
 exports.deleteUser = async (req, res) => {
   try {
-    const response = await axios.delete(`${USER_SERVICE_URL}/delete`, {
-      headers: { Authorization: req.headers.authorization },
-    });
-    res.status(200).json(response.data);
+    if (!req.headers.authorization) {
+      return res.status(400).json({ message: 'Authorization header is missing' });
+    }
+    const user = await makeRequest('DELETE', `${USER_SERVICE_URL}/delete`, null, req.headers.authorization);
+    res.status(200).json(user);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error deleting user' });
   }
 };
@@ -68,10 +78,9 @@ exports.deleteUser = async (req, res) => {
 // Отримання всіх користувачів
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await axios.get(`${USER_SERVICE_URL}/`);
-    res.status(200).json(users.data);
+    const users = await makeRequest('GET', `${USER_SERVICE_URL}/`);
+    res.status(200).json(users);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: 'Error fetching users' });
   }
 };
