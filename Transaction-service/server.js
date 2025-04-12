@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./db");
 const transactionRoutes = require("./routes/transactionRoutes");
+const { connectRabbitMQ } = require("./broker/transactionPublisher");
+
 
 const app = express();
 
@@ -12,6 +14,7 @@ app.use(express.json());
 
 // Підключення до бази даних
 connectDB();
+connectRabbitMQ();
 
 // Маршрути
 app.use('/api/transactions', transactionRoutes);

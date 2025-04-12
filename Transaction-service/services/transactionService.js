@@ -1,9 +1,14 @@
 const Transaction = require("../models/Transaction");
 const mongoose = require("mongoose");
+const { publishTransaction } = require("../broker/transactionPublisher");
 
 exports.addTransaction = async (userId, data) => {
   const transaction = new Transaction({ user_id: userId, ...data });
-  return await transaction.save();
+  const saved = await transaction.save();
+
+  publishTransaction(saved);
+
+  return saved;
 };
 
 exports.getTransactions = async (userId, filters = {}, sortBy = "transaction_date", order = "desc") => {
