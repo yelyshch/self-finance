@@ -1,4 +1,3 @@
-// authenticate.middleware.test.js
 const jwt = require('jsonwebtoken');
 const authenticate = require('../middleware/authenticate');
 
