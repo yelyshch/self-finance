@@ -297,6 +297,7 @@ const [allCategories, setAllCategories] = useState([]);
                 </div>
                 <div className="goal-info">
                   <p>Target: <strong>{goal.target_amount}</strong></p>
+                  <p>Current: <strong>{goal.current_amount}</strong></p>
                   <p>Deadline: <strong>{goal.deadline}</strong></p>
                   <div className="progress-bar">
                     <div className="progress" style={{ width: `${(goal.current_amount / goal.target_amount) * 100}%` }}></div>
