@@ -1,4 +1,3 @@
-// transaction.contract.test.js
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const Transaction = require('../models/Transaction');
@@ -45,10 +44,8 @@ describe('Transaction Service Contract Tests', () => {
         transaction_date: new Date(),
       };
 
-      // Act
       const createdTransaction = await transactionService.addTransaction(userId, transactionData);
 
-      // Assert - Contract Verification
       // 1. The transaction should be saved in the database
       const savedTransaction = await Transaction.findById(createdTransaction._id);
       expect(savedTransaction).toBeTruthy();
@@ -70,7 +67,6 @@ describe('Transaction Service Contract Tests', () => {
 
   describe('Contract: Transaction Retrieval', () => {
     it('should return transactions matching filter criteria', async () => {
-      // Arrange - Create test transactions
       const userId = new mongoose.Types.ObjectId();
       const testTransactions = [
         {
@@ -110,11 +106,9 @@ describe('Transaction Service Contract Tests', () => {
       // Save test transactions to database
       await Transaction.insertMany(testTransactions);
 
-      // Act - Retrieve with filters
       const filters = { type: 'expense' };
       const transactions = await transactionService.getTransactions(userId, filters);
 
-      // Assert - Contract Verification
       // 1. Should only return transactions for the specified user
       expect(transactions.length).toBe(2);
       transactions.forEach(transaction => {
@@ -142,7 +136,6 @@ describe('Transaction Service Contract Tests', () => {
     });
 
     it('should sort transactions as specified in contract', async () => {
-      // Arrange - Create test transactions with different dates
       const userId = new mongoose.Types.ObjectId();
       const testTransactions = [
         {
@@ -174,11 +167,9 @@ describe('Transaction Service Contract Tests', () => {
       // Save test transactions to database
       await Transaction.insertMany(testTransactions);
 
-      // Act - Retrieve with sorting
       const filters = { sort: 'amount_asc' };
       const transactions = await transactionService.getTransactions(userId, filters);
 
-      // Assert - Contract Verification for sorting
       expect(transactions.length).toBe(3);
 
       // Verify ascending order by amount
